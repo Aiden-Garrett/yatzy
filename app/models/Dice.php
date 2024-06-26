@@ -15,4 +15,8 @@ class Dice {
         $this->state = rand(1,6);
         return $this->state;
     }
+
+    function getState(): int {
+        return $this->state;
+    }
 }
