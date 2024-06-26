@@ -3,9 +3,10 @@ namespace Yatzy;
 use Yatzy\Dice;
 
 class YatzyGame {
-    private $rollNum;
-    private $diceStates;
-    private $keepers;
+    // made public to simplify unit tests (no need to make a getter/setter for each variable)
+    public $rollNum;
+    public $diceStates;
+    public $keepers;
 
     public function __construct() {
         $this->rollNum = 0;
