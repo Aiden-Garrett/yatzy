@@ -1,27 +1,26 @@
 <?php
-
-
 require_once('_config.php');
 ?>
 
-<div id="output">--</div>
-<button id="version">Version</button>
+<div id="die1">--</div>
+<button id="roll">Roll</button>
 
 <script>
-    const output = document.getElementById("output");
-    const version = document.getElementById("version");
-    version.onclick = function (e) {
+    const die1 = document.getElementById("die1");
+    const roll = document.getElementById("roll");
+    roll.onclick = function(e) {
+
         const xmlhttp = new XMLHttpRequest();
 
-        xmlhttp.onreadystatechange = function () {
+        xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == XMLHttpRequest.DONE) {
                 if (xmlhttp.status == 200) {
-                    output.innerHTML = xmlhttp.responseText;
+                    die1.innerHTML = xmlhttp.responseText;
                 }
             }
         };
 
-        xmlhttp.open("GET", "/public/api.php", true);
+        xmlhttp.open("GET", "/public/api.php?action=roll", true);
         xmlhttp.send();
     }
 </script>
