@@ -4,6 +4,7 @@ require_once('_config.php');
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
+use Yatzy\Dice;
 
 $app = AppFactory::create();
 
@@ -13,8 +14,22 @@ $app->get('/', function (Request $request, Response $response, $args) {
     return $response;
 });
 
-$app->run();
+$app->get('/api/version', function (Request $request, Response $response, $args) {
+    // fill me in
+    $data = ["version" => "1.0"];
+    $response->getBody()->write(json_encode($data));
+    return $response->withHeader('Content-Type', 'application/json');
+});
 
+$app->get('/api/roll', function (Request $request, Response $response, $args) {
+    // fill me in
+    $d = new Dice();
+    $data = ["value" => $d->roll()];
+    $response->getBody()->write(json_encode($data));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->run();
 
 //<!--// prev lab-->
 //<!--//require_once('_config.php');-->
