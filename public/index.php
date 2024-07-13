@@ -37,7 +37,7 @@ $app->get('/api/roll', function (Request $request, Response $response, $args) {
     $dice = $_SESSION["game"]->roll();
 
     for ($i = 0; $i < count($dice); $i++) {
-        $dice[$i] =  $dice[$i]->getState();
+        $dice[$i] = $dice[$i]->getState();
     }
     $response->getBody()->write(json_encode($dice));
     return $response->withHeader('Content-Type', 'application/json');
@@ -54,7 +54,12 @@ $app->get('/api/score', function (Request $request, Response $response, $args) {
 // scorecard
 // dice states + numbers
 $app->get('/api/game', function (Request $request, Response $response, $args) {
-
+    $data = [
+        "score" => $_SESSION["game"]->getScore(),
+        "rolls" => $_SESSION["game"]->getRolls(),
+        "dice" => [$_SESSION["game"]->getDice(), $_SESSION["game"]->getDiceStates()]
+    ];
+//    $_SESSION["game"]->
 });
 
 

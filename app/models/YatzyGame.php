@@ -39,6 +39,47 @@ class YatzyGame
         ];
     }
 
+    /**
+     * @return Dice[]
+     */
+    public function getDiceStates(): array
+    {
+        return $this->diceStates;
+    }
+
+    /**
+     * @return Dice[]
+     */
+    public function getKeepers(): array {
+        return $this->keepers;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRollNum(): int
+    {
+        return $this->rollNum;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getScoreState(): array
+    {
+        return $this->scoreState;
+    }
+
+    public function getDice()
+    {
+        $dice = array(1, 2, 3, 4, 5);
+
+        for ($i = 0; $i < count($dice); $i++) {
+            $dice[$i] = ["re-roll" => $this->keepers[$i], "value" => $this->diceStates[$i]->getState()];
+        }
+        return $dice;
+    }
+
     public function roll(): array
     {
         if ($this->rollNum >= 3) {
