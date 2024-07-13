@@ -7,9 +7,9 @@ use Slim\Factory\AppFactory;
 use Yatzy\Dice;
 use Yatzy\YatzyGame;
 
-
-$game = new YatzyGame();
-
+// make game in session
+session_start();
+$_SESSION["game"] = new YatzyGame();
 
 
 $app = AppFactory::create();
@@ -35,9 +35,81 @@ $app->get('/api/roll', function (Request $request, Response $response, $args) {
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+
 $app->get('/api/score', function (Request $request, Response $response, $args) {
+    $score = $_SESSION["game"]->roll();
+    $response->getBody()->write(json_encode($score));
+});
+
+// get info about state of game:
+// rolls remaining for turn
+// scorecard
+// dice states + numbers
+$app->get('/api/game', function (Request $request, Response $response, $args) {
 
 });
+
+// put methods to update score
+$app->put('api/chooseOnes', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseTwos', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseThrees', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseFours', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseFives', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseSixes', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseOnePair', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseTwoPairs', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseThreeOfAKind', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseFourOfAKind', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseSmallStraight', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseLargeStraight', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseFullHouse', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseChance', function (Request $request, Response $response, $args) {
+
+});
+
+$app->put('api/chooseYatzy', function (Request $request, Response $response, $args) {
+
+});
+
 
 $app->run();
 
