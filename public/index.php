@@ -66,10 +66,7 @@ $app->put('/api/toggleDice/{id}', function (Request $request, Response $response
 
 // put methods to update score
 $app->put('/api/choose${scoringMethod}', function (Request $request, Response $response, $args) {
-    switch ($args['scoringMethod']) {
-        case "Ones":
-
-    }
+    $_SESSION["game"]->chooseScoringMethod($args['id']);
 });
 
 
