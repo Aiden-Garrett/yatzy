@@ -10,6 +10,7 @@ use Yatzy\YatzyGame;
 // make game in session
 session_start();
 $_SESSION["game"] = new YatzyGame();
+//$_SESSION["leaderBoard"] = array();
 
 
 $app = AppFactory::create();
@@ -29,9 +30,16 @@ $app->get('/api/version', function (Request $request, Response $response, $args)
 
 $app->get('/api/roll', function (Request $request, Response $response, $args) {
     // fill me in
-    $d = new Dice();
-    $data = ["value" => $d->roll()];
-    $response->getBody()->write(json_encode($data));
+//    $d = new Dice();
+//    $data = ["value" => $d->roll()];
+//    $response->getBody()->write(json_encode($data));
+//    return $response->withHeader('Content-Type', 'application/json');
+    $dice = $_SESSION["game"]->roll();
+
+    for ($i = 0; $i < count($dice); $i++) {
+        $dice[$i] =  $dice[$i]->getState();
+    }
+    $response->getBody()->write(json_encode($dice));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
@@ -49,65 +57,19 @@ $app->get('/api/game', function (Request $request, Response $response, $args) {
 
 });
 
+
+//put
+$app->put('/api/toggleDice/{id}', function (Request $request, Response $response, $args) {
+    $_SESSION["game"]->toggleDice($args['id']);
+});
+
+
 // put methods to update score
-$app->put('api/chooseOnes', function (Request $request, Response $response, $args) {
+$app->put('/api/choose${scoringMethod}', function (Request $request, Response $response, $args) {
+    switch ($args['scoringMethod']) {
+        case "Ones":
 
-});
-
-$app->put('api/chooseTwos', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseThrees', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseFours', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseFives', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseSixes', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseOnePair', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseTwoPairs', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseThreeOfAKind', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseFourOfAKind', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseSmallStraight', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseLargeStraight', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseFullHouse', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseChance', function (Request $request, Response $response, $args) {
-
-});
-
-$app->put('api/chooseYatzy', function (Request $request, Response $response, $args) {
-
+    }
 });
 
 
