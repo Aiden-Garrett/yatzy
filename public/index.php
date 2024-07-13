@@ -5,11 +5,17 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Yatzy\Dice;
+use Yatzy\YatzyGame;
+
+
+$game = new YatzyGame();
+
+
 
 $app = AppFactory::create();
 
 $app->get('/', function (Request $request, Response $response, $args) {
-    $view = file_get_contents("{$GLOBALS["appDir"]}/views/index.html");
+    $view = file_get_contents("{$GLOBALS["appDir"]}/views/game.html");
     $response->getBody()->write($view);
     return $response;
 });
@@ -27,6 +33,10 @@ $app->get('/api/roll', function (Request $request, Response $response, $args) {
     $data = ["value" => $d->roll()];
     $response->getBody()->write(json_encode($data));
     return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->get('/api/score', function (Request $request, Response $response, $args) {
+
 });
 
 $app->run();
