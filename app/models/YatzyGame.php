@@ -50,7 +50,8 @@ class YatzyGame
     /**
      * @return Dice[]
      */
-    public function getKeepers(): array {
+    public function getKeepers(): array
+    {
         return $this->keepers;
     }
 
@@ -65,12 +66,12 @@ class YatzyGame
     /**
      * @return array[]
      */
-    public function getScoreState(): array
+    public function getScore(): array
     {
         return $this->scoreState;
     }
 
-    public function getDice()
+    public function getDice(): array
     {
         $dice = array(1, 2, 3, 4, 5);
 

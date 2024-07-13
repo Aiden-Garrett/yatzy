@@ -56,10 +56,11 @@ $app->get('/api/score', function (Request $request, Response $response, $args) {
 $app->get('/api/game', function (Request $request, Response $response, $args) {
     $data = [
         "score" => $_SESSION["game"]->getScore(),
-        "rolls" => $_SESSION["game"]->getRolls(),
-        "dice" => [$_SESSION["game"]->getDice(), $_SESSION["game"]->getDiceStates()]
+        "rolls" => $_SESSION["game"]->getRollNum(),
+        "dice" => $_SESSION["game"]->getDice()
     ];
-//    $_SESSION["game"]->
+    $response->getBody()->write(json_encode($data));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 
