@@ -9,9 +9,11 @@ use Yatzy\YatzyGame;
 
 // make game in session
 session_start();
-$_SESSION["game"] = new YatzyGame();
-//$_SESSION["leaderBoard"] = array();
 
+//$_SESSION["leaderBoard"] = array();s
+if (!isset($_SESSION["game"])) {
+    $_SESSION["game"] = new YatzyGame();
+}
 
 $app = AppFactory::create();
 
@@ -56,7 +58,7 @@ $app->get('/api/score', function (Request $request, Response $response, $args) {
 $app->get('/api/game', function (Request $request, Response $response, $args) {
     $data = [
         "score" => $_SESSION["game"]->getScore(),
-        "rolls" => $_SESSION["game"]->getRollNum(),
+        "rolls" => $_SESSION["game"]->getRollsRemaining(),
         "dice" => $_SESSION["game"]->getDice()
     ];
     $response->getBody()->write(json_encode($data));
@@ -64,19 +66,32 @@ $app->get('/api/game', function (Request $request, Response $response, $args) {
 });
 
 
-//put
 $app->put('/api/toggleDice/{id}', function (Request $request, Response $response, $args) {
-    $_SESSION["game"]->toggleDice($args['id']);
+    // ensure id is in range!
+    if ($args['id'] > 4 || $args['id'] < 0) {
+        return $response->withStatus(400, "id is out of range");
+    }
+    $_SESSION["game"]->toggleKeeper($args['id']);
+    $response->getBody()->write(json_encode(["state" => $_SESSION["game"]->getKeepers()[$args['id']]]));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
+// put method to update score
+$app->put('/api/choose/{scoringMethod}', function (Request $request, Response $response, $args) {
+    $message = $_SESSION["game"]->chooseScoringMethod($args['scoringMethod']);
+    $response->getBody()->write(json_encode(["message" => $message]));
 
-// put methods to update score
-$app->put('/api/choose${scoringMethod}', function (Request $request, Response $response, $args) {
-    $_SESSION["game"]->chooseScoringMethod($args['id']);
+    if ($message !== "successfully updated score") {
+        return $response->withStatus(400, $message);
+    }
+
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 
 $app->run();
+
+//session_destroy();
 
 //<!--// prev lab-->
 //<!--//require_once('_config.php');-->

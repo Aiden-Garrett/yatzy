@@ -1,4 +1,5 @@
 <?php
+namespace Yatzy;
 
 function calculateOnes($diceState): int
 {
@@ -158,7 +159,7 @@ function calculateSmallStraight($diceState): int
     return 15;
 }
 
-echo calculateSmallStraight([1, 2, 3, 4, 6, 5]);
+//echo calculateSmallStraight([1, 2, 3, 4, 6, 5]);
 
 
 function calculateLargeStraight($diceState): int
