@@ -87,7 +87,7 @@ class YatzyGame
 
     public function newGame()
     {
-        $score = calculateTotal($this->scoreState);
+        $score = $this->scoreState["total"];
         array_push($this->leaderBoard, $score);
         // reset everything about the game except the leaderboard
         $this->resetGame();
