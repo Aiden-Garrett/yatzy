@@ -95,7 +95,7 @@ class YatzyGame
 
     public function getLeaderBoard(): array
     {
-        sort($this->leaderBoard);
+        rsort($this->leaderBoard);
         return $this->leaderBoard;
     }
 

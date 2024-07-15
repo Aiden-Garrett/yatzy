@@ -30,7 +30,7 @@
     </div>
     <div id="leaderboardSection">
         <h3>Leaderboard</h3>
-        <p>No scores Yet!</p>
+        <p id="leaderboardMessage">No games played yet!</p>
         <ol id="leaderboard">
         </ol>
     </div>
@@ -163,8 +163,11 @@
     const scoreOutput = document.getElementById('scoreCard');
     const rows = scoreOutput.rows;
     const rollsRemaining = document.getElementById('rollsRemaining');
+    const leaderboard = document.getElementById('leaderboard');
+    const leaderboardMessage = document.getElementById('leaderboardMessage')
 
     render();
+    renderLeaderboard();
 
     // TODO: update this to use ajax
     // 1. send roll request to ajax server
@@ -190,6 +193,7 @@
             url: "api/newGame"
         }).then((data) => {
             render();
+            renderLeaderboard();
         })
     }
     // newGameButton.addEventListener('click', () => {
@@ -266,7 +270,6 @@
             }
 
             rollsRemaining.innerHTML = data.rolls;
-
             renderScoreCard();
 
         });
@@ -310,6 +313,31 @@
 
                 row.appendChild(td);
             }
+        });
+    }
+
+    async function renderLeaderboard() {
+        $.ajax({
+            type: "GET",
+            url: "api/leaderboard"
+        }).then((leaderboardData) => {
+
+
+            if (leaderboardData.length === 0) {
+                leaderboard.style.display = 'none';
+                leaderboardMessage.style.display = 'block';
+            } else {
+                leaderboardMessage.style.display  = 'none';
+                leaderboard.style.display = 'block';
+
+                leaderboard.innerHTML = "";
+                for (let i = 0; i < leaderboardData.length; i++) {
+                    let li = document.createElement('li');
+                    li.innerHTML = `${leaderboardData[i]} points`;
+                    leaderboard.appendChild(li);
+                }
+            }
+
         });
     }
 </script>
