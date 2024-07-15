@@ -114,7 +114,7 @@ th, td {
     max-width: 12ch;
 }
 
-tr:hover:not(.used, .label, #total, #upperSum, #bonus) {
+tr:hover:not(.used, .label, #total, #upperScore, #bonus) {
     background-color: #90EE90FF;
 }
 
