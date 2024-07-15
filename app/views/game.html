@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yatzy</title>
+    <script type="text/javascript" src="/assets/jquery-3.7.1.min.js"></script>
     <script type="module" src="./assets/dice.js"></script>
     <script type="module" src="./assets/yatzy_game.js"></script>
     <script type="text/javascript" src="./assets/yatzy_engine.js"></script>
@@ -15,7 +16,8 @@
     <div id="rules">
         <h3>Rules</h3>
         <p>You have up to 2 re-rolls per turn. In each turn you can choose which dice you keep (the rest are rerolled).
-            During each turn you must choose a method to score as described on the scorecard. Each scoring method must be used only once per game.</p>
+            During each turn you must choose a method to score as described on the scorecard. Each scoring method must
+            be used only once per game.</p>
         <h3>Controls</h3>
         <ul>
             <li>Click the roll button to roll</li>
@@ -70,7 +72,7 @@
             <td>The sum of all dice with the number 6</td>
             <td>30</td>
         </tr>
-        <tr id="upperSum">
+        <tr id="upperScore">
             <th>Sum</th>
             <td>Sum off upper section</td>
             <td>105</td>
@@ -145,10 +147,8 @@
     </div>
 </div>
 
-<script type="module">
-    import YatzyGame from '/public/assets/yatzy_game.js';
-
-    let game = new YatzyGame();
+<script>
+    // let game = new YatzyGame();
     const rollButton = document.getElementById('rollButton');
     const newGameButton = document.getElementById('newGameButton')
     const diceOutput = document.getElementById('diceOutput');
@@ -164,18 +164,30 @@
     // 3. php will send array of dice values
     // 4. render all of the dice
     // should the response also include
-    rollButton.addEventListener('click', () => {
-        game.rollDice();
-        render();
-    });
+    rollButton.onclick = async function () {
+        $.ajax({
+            type: "GET",
+            url: "api/roll"
+        }).then((data) => {
+            render();
+        });
+    };
 
     // TODO: update this to use ajax
     // 1. send request to ajax to restart
-    //
-    newGameButton.addEventListener('click', () => {
-        game = new YatzyGame();
-        render();
-    })
+    // //
+    newGameButton.onclick = async function () {
+        $.ajax({
+            type: "POST",
+            url: "api/newGame"
+        }).then((data) => {
+            render();
+        })
+    }
+    // newGameButton.addEventListener('click', () => {
+    //     game = new YatzyGame();
+    //     render();
+    // })
 
     // TODO: update this to use ajax
     //
@@ -185,50 +197,112 @@
         // clear dice
         diceOutput.innerHTML = "";
         //re-render dice
-        game.dices.forEach((dice) => {
-            diceOutput.appendChild(dice.render());
+
+        $.ajax({
+            type: "GET",
+            url: "api/game"
+        }).then((data) => {
+            console.log(data.dice);
+            console.log(data.rolls);
+
+            for (const diceNum in data.dice) {
+                let dice = document.createElement('div');
+
+                dice.className = 'dice';
+
+                if (data.dice[diceNum].keeper) {
+                    dice.classList.add('locked');
+                }
+
+                dice.onclick = async function () {
+                    $.ajax({
+                        type: "POST",
+                        url: `api/toggleDice/${diceNum}`
+                    }).then(() => {
+                        render();
+                    })
+                }
+
+                const layouts = {
+                    1: [false, false, false,
+                        false, true, false,
+                        false, false, false],
+                    2: [true, false, false,
+                        false, false, false,
+                        false, false, true],
+                    3: [true, false, false,
+                        false, true, false,
+                        false, false, true],
+                    4: [true, false, true,
+                        false, false, false,
+                        true, false, true],
+                    5: [true, false, true,
+                        false, true, false,
+                        true, false, true],
+                    6: [true, false, true,
+                        true, false, true,
+                        true, false, true],
+                }
+
+                //rerender dice
+                for (let i = 0; i < 9; i++) {
+                    let child = document.createElement("div");
+                    if (layouts[parseInt(data.dice[diceNum].value)][i]) {
+                        child.className = "dot";
+                    }
+                    dice.appendChild(child);
+                }
+
+
+                diceOutput.appendChild(dice);
+            }
+
+            rollsRemaining.innerHTML = data.rolls;
+
+            renderScoreCard();
+
         });
-        renderScoreCard();
-        rollsRemaining.innerHTML = game.rollsRemaining;
     }
 
     // TODO: update this to use ajax
     function renderScoreCard() {
-        let diceState = game.getDice();
 
-        for (let row of rows) {
+        console.log("score")
+        $.ajax({
+            type: "GET",
+            url: "api/score"
+        }).then((score) => {
+            console.log(score);
 
-            if (row.classList.contains('label')) {
-                continue;
-            }
+            for (const scoringMethod in score) {
+                let row = document.getElementById(scoringMethod);
+                let td = document.createElement('td');
+                row.removeChild(row.lastChild);
 
-            row.removeChild(row.lastChild)
-            let td = document.createElement('td')
-            let id = row.id;
-            //remove click event listener (to make rerendering quick).
-            row.removeEventListener('click', row.fn);
-            // need to mark rows as unused (will get marked when rendering)
-            // need to do this because when starting new game it needs to be reset
-            row.classList.remove('used');
-            if (id !== "") {
-                if (game.scoreState[id] === undefined) {
-                    let func = `calculate${id.charAt(0).toUpperCase() + id.slice(1)}(game.scoreState)`;
-                    td.innerHTML = eval(func);
-                } else if (game.scoreState[id] !== null) {
-                    row.className = 'used';
-                    td.innerHTML = game.scoreState[id];
+                if (scoringMethod !== "upperScore" && scoringMethod !== "bonus" && scoringMethod !== "total") {
+                    row.onclick = async function () {
+                        $.ajax({
+                            type: "PUT",
+                            url: `api/choose/${scoringMethod}`
+                        }).then(() => {
+                            render();
+                        });
+                    }
+
+                    if (score[scoringMethod].chosen) {
+                        row.className = 'used';
+                    } else {
+                        row.classList.remove('used');
+                    }
+
+                    td.innerHTML = score[scoringMethod].score;
                 } else {
-                    // store reference to function so it can be deleted
-                    row.addEventListener('click', row.fn = () => {
-                        game.selectScore(id);
-                        render();
-                    });
-                    let func = `calculate${id.charAt(0).toUpperCase() + id.slice(1)}(diceState)`;
-                    td.innerHTML = eval(func);
+                    td.innerHTML = score[scoringMethod];
                 }
+                
+                row.appendChild(td);
             }
-            row.append(td);
-        }
+        });
     }
 </script>
 </body>

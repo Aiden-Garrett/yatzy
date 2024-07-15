@@ -1,5 +1,5 @@
 <?php
-namespace Yatzy;
+//namespace Yatzy;
 
 function calculateOnes($diceState): int
 {
@@ -73,7 +73,7 @@ function calculateOnePair($diceState): int
     // sort in descending order
     rsort($diceState);
     $l = 0;
-    for ($r = 1; $r < count(diceState); $l++, $r++) {
+    for ($r = 1; $r < count($diceState); $l++, $r++) {
         // if a pair is found, it is the max sum pair
         if ($diceState[$r] === $diceState[$l]) {
             return $diceState[$r] * 2;
@@ -214,7 +214,32 @@ function calculateYatzy($diceStates): int {
 
 function calculateUpperSum($gameState) {
     // null = 0 in js so this works
-    return $gameState['ones'] + $gameState['twos'] + $gameState['threes'] + $gameState['fours'] + $gameState['fives'] + $gameState['sixes'];
+    $sum = 0;
+    if ($gameState['ones']['chosen']) {
+        $sum += $gameState['ones']['score'];
+    }
+
+    if ($gameState['twos']['chosen']) {
+        $sum += $gameState['twos']['score'];
+    }
+
+    if ($gameState['threes']['chosen']) {
+        $sum += $gameState['threes']['score'];
+    }
+
+    if ($gameState['four']['chosen']) {
+        $sum += $gameState['fours']['score'];
+    }
+
+    if ($gameState['fives']['chosen']) {
+        $sum += $gameState['fives']['score'];
+    }
+
+    if ($gameState['sixes']['chosen']) {
+        $sum += $gameState['sixes']['score'];
+    }
+
+    return $sum;
 }
 
 function calculateBonus($gameState): int {

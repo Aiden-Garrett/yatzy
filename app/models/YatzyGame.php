@@ -3,6 +3,7 @@
 namespace Yatzy;
 
 use Yatzy\Dice;
+
 require_once('YatzyEngine.php');
 
 class YatzyGame
@@ -12,32 +13,12 @@ class YatzyGame
     public $diceStates;
     public $keepers;
     public $scoreState;
+    public $leaderBoard;
 
     public function __construct()
     {
-        $this->rollsRemaining = 3;
-        $this->diceStates = [new Dice(), new Dice(), new Dice(), new Dice(), new Dice()];
-        $this->keepers = [false, false, false, false, false];
-        $this->scoreState = [
-            //upper section
-            "ones" => ["chosen" => false, "score" => 0],
-            "twos" => ["chosen" => false, "score" => 0],
-            "threes" => ["chosen" => false, "score" => 0],
-            "fours" => ["chosen" => false, "score" => 0],
-            "fives" => ["chosen" => false, "score" => 0],
-            "sixes" => ["chosen" => false, "score" => 0],
-
-            // lower section
-            "onePair" => ["chosen" => false, "score" => 0],
-            "twoPairs" => ["chosen" => false, "score" => 0],
-            "threeOfAKind" => ["chosen" => false, "score" => 0],
-            "fourOfAKind" => ["chosen" => false, "score" => 0],
-            "smallStraight" => ["chosen" => false, "score" => 0],
-            "largeStraight" => ["chosen" => false, "score" => 0],
-            "fullHouse" => ["chosen" => false, "score" => 0],
-            "chance" => ["chosen" => false, "score" => 0],
-            "yatzy" => ["chosen" => false, "score" => 0]
-        ];
+        $this->leaderBoard = array();
+        $this->resetGame();
     }
 
     public function getDiceValues(): array
@@ -78,17 +59,44 @@ class YatzyGame
      */
     public function getScore(): array
     {
+        $total = 0;
+        // update score card
+        foreach ($this->scoreState as $scoringMethod => $data) {
+            if ($scoringMethod !== "upperScore" && $scoringMethod !== "bonus" && $scoringMethod !== "total") {
+                if (!$data["chosen"]) {
+                    $this->scoreState[$scoringMethod]["score"] = call_user_func("calculate" . ucfirst($scoringMethod), $this->getDiceValues());
+                } else {
+                    $total += $data["score"];
+                }
+            }
+        }
+
+        $this->scoreState["total"] = $total + $this->scoreState["bonus"];
         return $this->scoreState;
     }
 
     public function getDice(): array
     {
         $dice = array(1, 2, 3, 4, 5);
-
         for ($i = 0; $i < count($dice); $i++) {
-            $dice[$i] = ["re-roll" => $this->keepers[$i], "value" => $this->diceStates[$i]->getState()];
+            $dice[$i] = ["keeper" => $this->keepers[$i], "value" => $this->diceStates[$i]->getState()];
         }
         return $dice;
+    }
+
+
+    public function newGame()
+    {
+        $score = calculateTotal($this->scoreState);
+        array_push($this->leaderBoard, $score);
+        // reset everything about the game except the leaderboard
+        $this->resetGame();
+    }
+
+    public function getLeaderBoard(): array
+    {
+        sort($this->leaderBoard);
+        return $this->leaderBoard;
     }
 
     public function roll(): array
@@ -104,6 +112,7 @@ class YatzyGame
                 }
             }
         }
+
         return $this->diceStates;
     }
 
@@ -127,6 +136,8 @@ class YatzyGame
                 if (!$this->scoreState["ones"]["chosen"]) {
                     $this->scoreState["ones"]["chosen"] = true;
                     $this->scoreState["ones"]["score"] = calculateOnes($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["ones"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -135,6 +146,8 @@ class YatzyGame
                 if (!$this->scoreState["twos"]["chosen"]) {
                     $this->scoreState["twos"]["chosen"] = true;
                     $this->scoreState["twos"]["score"] = calculateTwos($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["twos"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -143,6 +156,8 @@ class YatzyGame
                 if (!$this->scoreState["threes"]["chosen"]) {
                     $this->scoreState["threes"]["chosen"] = true;
                     $this->scoreState["threes"]["score"] = calculateThrees($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["threes"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -151,6 +166,8 @@ class YatzyGame
                 if (!$this->scoreState["fours"]["chosen"]) {
                     $this->scoreState["fours"]["chosen"] = true;
                     $this->scoreState["fours"]["score"] = calculateFours($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["fours"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -159,6 +176,8 @@ class YatzyGame
                 if (!$this->scoreState["fives"]["chosen"]) {
                     $this->scoreState["fives"]["chosen"] = true;
                     $this->scoreState["fives"]["score"] = calculateFives($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["fives"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -167,6 +186,8 @@ class YatzyGame
                 if (!$this->scoreState["sixes"]["chosen"]) {
                     $this->scoreState["sixes"]["chosen"] = true;
                     $this->scoreState["sixes"]["score"] = calculateSixes($this->getDiceValues());
+                    $this->scoreState["upperScore"] += $this->scoreState["sixes"]["score"];
+                    $this->scoreState["bonus"] = $this->scoreState["upperScore"] >= 63 ? 50 : 0;
                 } else {
                     return "Already chosen";
                 }
@@ -255,11 +276,45 @@ class YatzyGame
     {
         $out = "Roll number: {$this->rollsRemaining}<br>";
         $i = 0;
+
         foreach ($this->diceStates as $diceState) {
             ++$i;
             $out .= "DICE {$i}: {$diceState->getState()}<br>";
         }
 
         return $out;
+    }
+
+    /**
+     * @return void
+     */
+    public function resetGame(): void
+    {
+        $this->rollsRemaining = 3;
+        $this->diceStates = [new Dice(), new Dice(), new Dice(), new Dice(), new Dice()];
+        $this->keepers = [false, false, false, false, false];
+        $this->scoreState = [
+            //upper section
+            "ones" => ["chosen" => false, "score" => 0],
+            "twos" => ["chosen" => false, "score" => 0],
+            "threes" => ["chosen" => false, "score" => 0],
+            "fours" => ["chosen" => false, "score" => 0],
+            "fives" => ["chosen" => false, "score" => 0],
+            "sixes" => ["chosen" => false, "score" => 0],
+            "upperScore" => 0,
+            "bonus" => 0,
+
+            // lower section
+            "onePair" => ["chosen" => false, "score" => 0],
+            "twoPairs" => ["chosen" => false, "score" => 0],
+            "threeOfAKind" => ["chosen" => false, "score" => 0],
+            "fourOfAKind" => ["chosen" => false, "score" => 0],
+            "smallStraight" => ["chosen" => false, "score" => 0],
+            "largeStraight" => ["chosen" => false, "score" => 0],
+            "fullHouse" => ["chosen" => false, "score" => 0],
+            "chance" => ["chosen" => false, "score" => 0],
+            "yatzy" => ["chosen" => false, "score" => 0],
+            "total" => 0
+        ];
     }
 }

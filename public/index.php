@@ -30,6 +30,12 @@ $app->get('/api/version', function (Request $request, Response $response, $args)
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->get('/api/leaderboard', function (Request $request, Response $response, $args) {
+    $leaderboard = $_SESSION["game"]->getLeaderboard();
+    $response->getBody()->write(json_encode($leaderboard));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
 $app->get('/api/roll', function (Request $request, Response $response, $args) {
     // fill me in
 //    $d = new Dice();
@@ -47,8 +53,9 @@ $app->get('/api/roll', function (Request $request, Response $response, $args) {
 
 
 $app->get('/api/score', function (Request $request, Response $response, $args) {
-    $score = $_SESSION["game"]->roll();
+    $score = $_SESSION["game"]->getScore();
     $response->getBody()->write(json_encode($score));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 // get info about state of game:
@@ -66,7 +73,7 @@ $app->get('/api/game', function (Request $request, Response $response, $args) {
 });
 
 
-$app->put('/api/toggleDice/{id}', function (Request $request, Response $response, $args) {
+$app->post('/api/toggleDice/{id}', function (Request $request, Response $response, $args) {
     // ensure id is in range!
     if ($args['id'] > 4 || $args['id'] < 0) {
         return $response->withStatus(400, "id is out of range");
@@ -88,9 +95,12 @@ $app->put('/api/choose/{scoringMethod}', function (Request $request, Response $r
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+$app->post('/api/newGame', function (Request $request, Response $response, $args) {
+   $_SESSION["game"]->newGame();
+});
 
 $app->run();
-
+////
 //session_destroy();
 
 //<!--// prev lab-->
