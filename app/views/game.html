@@ -169,12 +169,6 @@
     render();
     renderLeaderboard();
 
-    // TODO: update this to use ajax
-    // 1. send roll request to ajax server
-    // 2. php will roll dice using the same logic as js
-    // 3. php will send array of dice values
-    // 4. render all of the dice
-    // should the response also include
     rollButton.onclick = async function () {
         $.ajax({
             type: "GET",
@@ -184,9 +178,6 @@
         });
     };
 
-    // TODO: update this to use ajax
-    // 1. send request to ajax to restart
-    // //
     newGameButton.onclick = async function () {
         $.ajax({
             type: "POST",
@@ -201,10 +192,6 @@
     //     render();
     // })
 
-    // TODO: update this to use ajax
-    //
-    //
-    //
     function render() {
         // clear dice
         diceOutput.innerHTML = "";
