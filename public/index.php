@@ -110,7 +110,7 @@ $app->post('/api/newGame', function (Request $request, Response $response, $args
 });
 
 $app->run();
-////
+//run////
 //session_destroy();
 
 //<!--// prev lab-->
