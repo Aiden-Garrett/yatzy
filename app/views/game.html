@@ -275,7 +275,6 @@
         });
     }
 
-    // TODO: update this to use ajax
     function renderScoreCard() {
 
         console.log("score")
@@ -319,7 +318,7 @@
     async function renderLeaderboard() {
         $.ajax({
             type: "GET",
-            url: "api/leaderboard"
+            url: "api/leaderboard/10"
         }).then((leaderboardData) => {
 
 
@@ -333,7 +332,7 @@
                 leaderboard.innerHTML = "";
                 for (let i = 0; i < leaderboardData.length; i++) {
                     let li = document.createElement('li');
-                    li.innerHTML = `${leaderboardData[i]} points`;
+                    li.innerHTML = `${leaderboardData[i].toString().padStart(3, "  ")} points`;
                     leaderboard.appendChild(li);
                 }
             }
